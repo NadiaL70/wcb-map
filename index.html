@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WCB 2026 | Global Community Map</title>
+    <style>
+        :root { --brand-blue: #00d2ff; --dark-bg: #0b0e14; }
+        body { background-color: var(--dark-bg); color: white; font-family: 'Inter', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
+        
+        .stats-grid { display: flex; gap: 40px; margin-bottom: 30px; background: rgba(255,255,255,0.05); padding: 20px 40px; border-radius: 50px; border: 1px solid rgba(0,210,255,0.3); }
+        .stat-card { text-align: center; }
+        .num { font-size: 2.5rem; font-weight: bold; color: var(--brand-blue); display: block; }
+        .label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; }
+
+        .map-container { position: relative; width: 100%; max-width: 1000px; background: rgba(255,255,255,0.02); border-radius: 20px; padding: 10px; border: 1px solid rgba(255,255,255,0.1); }
+        .base-map { width: 100%; display: block; opacity: 0.25; filter: invert(1); pointer-events: none; }
+
+        .ping {
+            position: absolute;
+            width: 8px; height: 8px;
+            background-color: var(--brand-blue);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px var(--brand-blue);
+        }
+        .ping::after {
+            content: ''; position: absolute; width: 100%; height: 100%;
+            border: 1px solid var(--brand-blue); border-radius: 50%;
+            animation: pulse 2.5s infinite;
+        }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(4); opacity: 0; } }
+
+        .ping:hover::before {
+            content: attr(title);
+            position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
+            background: white; color: black; padding: 4px 8px; border-radius: 4px;
+            font-size: 11px; font-weight: bold; white-space: nowrap; z-index: 100;
+        }
+
+        .cta-btn { margin-top: 30px; background: var(--brand-blue); color: #000; padding: 15px 30px; border-radius: 30px; text-decoration: none; font-weight: bold; transition: 0.3s; }
+        .cta-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,210,255,0.5); }
+    </style>
+</head>
+<body>
+
+    <h1>WCB 2026 Global Reach</h1>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="num" id="count-attendees">0</span>
+            <span class="label">Registrants</span>
+        </div>
+        <div class="stat-card">
+            <span class="num" id="count-countries">0</span>
+            <span class="label">Countries</span>
+        </div>
+    </div>
+
+    <div class="map-container" id="map">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg" class="base-map">
+    </div>
+
+    <a href="YOUR_REGISTRATION_LINK" class="cta-btn">Register & Join the Map →</a>
+
+  <script>
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSOjDCF8O1kJoBoigy8sl3lRLMvxVOSvg-scxdb5C1hv3usB6uwGZR9CP97fLs_E_GdNhHXidpi7Gv8/pub?output=csv';
+
+    function getCoords(city) {
+        const hubs = {
+            'Vancouver': { t: 30.5, l: 15.5 },
+            'Calgary': { t: 31.5, l: 18.2 },
+            'London': { t: 28.5, l: 46.2 },
+            'Zurich': { t: 32.5, l: 48.8 }
+        };
+        // This makes sure it's case-insensitive (vancouver vs Vancouver)
+        const cleanCity = city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
+        return hubs[cleanCity] || { t: 45 + Math.random()*5, l: 45 + Math.random()*5 };
+    }
+
+    async function initMap() {
+        try {
+            console.log("Attempting to fetch data...");
+            const response = await fetch(csvUrl);
+            const text = await response.text();
+            
+            // This cleans up weird line breaks from Google
+            const rows = text.split(/\r?\n/).slice(1); 
+            console.log("Rows found:", rows.length);
+
+            const countryList = new Set();
+            const mapDiv = document.getElementById('map');
+            
+            rows.forEach(row => {
+                // This cleans up spaces around the commas
+                const columns = row.split(',').map(item => item.trim());
+                const city = columns[0];
+                const country = columns[1];
+
+                if (city && city !== "") {
+                    countryList.add(country);
+                    const pos = getCoords(city);
+                    
+                    const ping = document.createElement('div');
+                    ping.className = 'ping';
+                    ping.style.top = pos.t + '%';
+                    ping.style.left = pos.l + '%';
+                    ping.setAttribute('title', `${city}, ${country}`);
+                    mapDiv.appendChild(ping);
+                }
+            });
+
+            document.getElementById('count-attendees').innerText = rows.filter(r => r.trim() !== "").length;
+            document.getElementById('count-countries').innerText = countryList.size;
+
+        } catch (err) {
+            console.error("Vibe Check Failed:", err);
+            alert("Could not load data. Check the console for errors.");
+        }
+    }
+
+    initMap();
+</script>
+</body>
+</html>
