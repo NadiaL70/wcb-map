@@ -124,26 +124,20 @@
         };
 
 function getPos(city) {
-    const data = hubs[city];
-    if (!data) return null;
+            const data = hubs[city];
+            if (!data) return null;
 
-    // --- CALIBRATION BOX ---
-    const verticalScale = 0.42; 
-    const equatorOffset = 42; 
+            // ADJUSTMENT SETTINGS
+            const vScale = 0.42; 
+            const eOffset = 42; 
+            const vShift = 2.8;   // Moves dots South
+            const hShift = -1.4;  // Moves dots West
 
-    // Adjust these two numbers to "slide" the whole group of dots
-    const verticalShift = 3.5;   // INCREASE this to move dots FURTHER SOUTH (cm down)
-    const horizontalShift = -1.6; // DECREASE this to move dots FURTHER WEST (cm left)
-    // -----------------------
+            const x = ((data.lng + 180) * (100 / 360)) + hShift;
+            const y = eOffset - (data.lat * vScale) + vShift; 
 
-    // Horizontal math + shift
-    const x = ((data.lng + 180) * (100 / 360)) + horizontalShift;
-    
-    // Vertical math + offset + shift
-    const y = equatorOffset - (data.lat * verticalScale) + verticalShift; 
-
-    return { t: y, l: x };
-}
+            return { t: y, l: x };
+        }
 
         async function loadData() {
             try {
@@ -161,24 +155,24 @@ function getPos(city) {
                     if (city && hubs[city]) {
                         countries.add(country);
                         const pos = getPos(city);
-                        const dot = document.createElement('div');
-                        dot.className = 'ping';
-                        dot.style.top = pos.t + '%';
-                        dot.style.left = pos.l + '%';
-                        dot.setAttribute('title', `${city}, ${country}`);
-                        mapArea.appendChild(dot);
+                        if (pos) {
+                            const dot = document.createElement('div');
+                            dot.className = 'ping';
+                            dot.style.top = pos.t + '%';
+                            dot.style.left = pos.l + '%';
+                            dot.setAttribute('title', `${city}, ${country}`);
+                            mapArea.appendChild(dot);
+                        }
                     } else if (country) {
                         countries.add(country);
                     }
                 });
 
-                document.getElementById('count-attendees').innerText = lines.filter(l => l.trim() !== "").length;
-                document.getElementById('count-countries').innerText = countries.size;
+                document.getElementById('count-a').innerText = lines.filter(l => l.trim() !== "").length;
+                document.getElementById('count-c').innerText = countries.size;
             } catch (e) { console.error("Error:", e); }
         }
         loadData();
     </script>
 </body>
 </html>
-
-
