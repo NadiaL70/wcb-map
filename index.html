@@ -99,17 +99,46 @@
             'Beijing': { lat: 39.90, lng: 116.40 }, 'Exeter': { lat: 50.71, lng: -3.53 },
             'Gwangju': { lat: 35.16, lng: 126.85 }, 'Sendai': { lat: 38.26, lng: 140.86 },
             'Innsbruck': { lat: 47.26, lng: 11.40 }, 'Erlangen': { lat: 49.58, lng: 11.00 }
+            'Pittsburgh': { lat: 40.44, lng: -79.99 },
+'Ann Arbor': { lat: 42.28, lng: -83.74 },
+'Daejeon': { lat: 36.35, lng: 127.38 },
+'Ames': { lat: 42.03, lng: -93.63 },
+'Iowa City': { lat: 41.66, lng: -91.53 },
+'Leeds': { lat: 53.80, lng: -1.54 },
+'Bern': { lat: 46.94, lng: 7.44 },
+'Goesan': { lat: 36.81, lng: 127.79 },
+'Koblenz': { lat: 50.35, lng: 7.58 },
+'Galway': { lat: 53.27, lng: -9.05 },
+'Bath': { lat: 51.37, lng: -2.35 },
+'Providence': { lat: 41.82, lng: -71.41 },
+'Cleveland': { lat: 41.49, lng: -81.69 },
+'Morgantown': { lat: 39.62, lng: -79.95 },
+'Wuhan': { lat: 30.59, lng: 114.30 },
+'Braunschweig': { lat: 52.26, lng: 10.52 },
+'Nottingham': { lat: 52.95, lng: -1.15 },
+'Blacksburg': { lat: 37.22, lng: -80.41 },
+'Innsbruck': { lat: 47.26, lng: 11.40 },
+'East Lansing': { lat: 42.73, lng: -84.48 },
+'Tel Aviv': { lat: 32.08, lng: 34.78 },
+'Burnaby': { lat: 49.24, lng: -122.98 }
         };
 
-        function getPos(city) {
-            const data = hubs[city];
-            if (!data) return null; // Skips "Unknown" or missing cities
+function getPos(city) {
+    const data = hubs[city];
+    if (!data) return null;
 
-            // Calculation for the specific Robinson Map SVG
-            const x = (data.lng + 180) * (100 / 360);
-            const y = 50 - (data.lat * 0.53); // Adjustable "fudge factor" for vertical alignment
-            return { t: y, l: x };
-        }
+    // ADJUST THESE TWO NUMBERS TO ALIGN EVERYTHING
+    const verticalScale = 0.42; // Shrinks or stretches the dots vertically
+    const equatorOffset = 42;   // Moves all dots up or down (42 is a common sweet spot)
+
+    // Horizontal is usually fine at 100/360
+    const x = (data.lng + 180) * (100 / 360);
+    
+    // Vertical math with calibration
+    const y = equatorOffset - (data.lat * verticalScale); 
+
+    return { t: y, l: x };
+}
 
         async function loadData() {
             try {
@@ -146,3 +175,4 @@
     </script>
 </body>
 </html>
+
