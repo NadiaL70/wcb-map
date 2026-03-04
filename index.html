@@ -31,7 +31,6 @@
         }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(4); opacity: 0; } }
 
-        /* Tooltip on hover */
         .ping:hover::before {
             content: attr(title);
             position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
@@ -62,7 +61,6 @@
     <script>
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSOjDCF8O1kJoBoigy8sl3lRLMvxVOSvg-scxdb5C1hv3usB6uwGZR9CP97fLs_E_GdNhHXidpi7Gv8/pub?output=csv';
 
-        // Master City List with Lat/Lng
         const hubs = {
             'Vancouver': { lat: 49.28, lng: -123.12 }, 'Calgary': { lat: 51.04, lng: -114.07 },
             'Edmonton': { lat: 53.54, lng: -113.49 }, 'Ottawa': { lat: 45.42, lng: -75.69 },
@@ -98,40 +96,24 @@
             'Wuhan': { lat: 30.59, lng: 114.30 }, 'Hong Kong': { lat: 22.31, lng: 114.16 },
             'Beijing': { lat: 39.90, lng: 116.40 }, 'Exeter': { lat: 50.71, lng: -3.53 },
             'Gwangju': { lat: 35.16, lng: 126.85 }, 'Sendai': { lat: 38.26, lng: 140.86 },
-            'Innsbruck': { lat: 47.26, lng: 11.40 }, 'Erlangen': { lat: 49.58, lng: 11.00 }
-            'Pittsburgh': { lat: 40.44, lng: -79.99 },
-'Ann Arbor': { lat: 42.28, lng: -83.74 },
-'Daejeon': { lat: 36.35, lng: 127.38 },
-'Ames': { lat: 42.03, lng: -93.63 },
-'Iowa City': { lat: 41.66, lng: -91.53 },
-'Leeds': { lat: 53.80, lng: -1.54 },
-'Bern': { lat: 46.94, lng: 7.44 },
-'Goesan': { lat: 36.81, lng: 127.79 },
-'Koblenz': { lat: 50.35, lng: 7.58 },
-'Galway': { lat: 53.27, lng: -9.05 },
-'Bath': { lat: 51.37, lng: -2.35 },
-'Providence': { lat: 41.82, lng: -71.41 },
-'Cleveland': { lat: 41.49, lng: -81.69 },
-'Morgantown': { lat: 39.62, lng: -79.95 },
-'Wuhan': { lat: 30.59, lng: 114.30 },
-'Braunschweig': { lat: 52.26, lng: 10.52 },
-'Nottingham': { lat: 52.95, lng: -1.15 },
-'Blacksburg': { lat: 37.22, lng: -80.41 },
-'Innsbruck': { lat: 47.26, lng: 11.40 },
-'East Lansing': { lat: 42.73, lng: -84.48 },
-'Tel Aviv': { lat: 32.08, lng: 34.78 },
-'Burnaby': { lat: 49.24, lng: -122.98 }
+            'Innsbruck': { lat: 47.26, lng: 11.40 }, 'Erlangen': { lat: 49.58, lng: 11.00 },
+            'Goesan': { lat: 36.81, lng: 127.79 }, 'Koblenz': { lat: 50.35, lng: 7.58 },
+            'Bath': { lat: 51.37, lng: -2.35 }, 'Providence': { lat: 41.82, lng: -71.41 },
+            'Cleveland': { lat: 41.49, lng: -81.69 }, 'Morgantown': { lat: 39.62, lng: -79.95 },
+            'Braunschweig': { lat: 52.26, lng: 10.52 }, 'Nottingham': { lat: 52.95, lng: -1.15 },
+            'Blacksburg': { lat: 37.22, lng: -80.41 }, 'East Lansing': { lat: 42.73, lng: -84.48 },
+            'Tel Aviv': { lat: 32.08, lng: 34.78 }
         };
 
-function getPos(city) {
+        function getPos(city) {
             const data = hubs[city];
             if (!data) return null;
 
-            // ADJUSTMENT SETTINGS
+            // UPDATED CALIBRATION: Moved dots South and West
             const vScale = 0.42; 
             const eOffset = 42; 
-            const vShift = 2.8;   // Moves dots South
-            const hShift = -1.4;  // Moves dots West
+            const vShift = 4.2;   // Increased to move dots further SOUTH
+            const hShift = -2.6;  // Decreased to move dots further WEST
 
             const x = ((data.lng + 180) * (100 / 360)) + hShift;
             const y = eOffset - (data.lat * vScale) + vShift; 
@@ -168,8 +150,8 @@ function getPos(city) {
                     }
                 });
 
-                document.getElementById('count-a').innerText = lines.filter(l => l.trim() !== "").length;
-                document.getElementById('count-c').innerText = countries.size;
+                document.getElementById('count-attendees').innerText = lines.filter(l => l.trim() !== "").length;
+                document.getElementById('count-countries').innerText = countries.size;
             } catch (e) { console.error("Error:", e); }
         }
         loadData();
