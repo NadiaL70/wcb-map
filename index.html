@@ -127,15 +127,20 @@ function getPos(city) {
     const data = hubs[city];
     if (!data) return null;
 
-    // ADJUST THESE TWO NUMBERS TO ALIGN EVERYTHING
-    const verticalScale = 0.42; // Shrinks or stretches the dots vertically
-    const equatorOffset = 42;   // Moves all dots up or down (42 is a common sweet spot)
+    // --- CALIBRATION BOX ---
+    const verticalScale = 0.42; 
+    const equatorOffset = 42; 
 
-    // Horizontal is usually fine at 100/360
-    const x = (data.lng + 180) * (100 / 360);
+    // Adjust these two numbers to "slide" the whole group of dots
+    const verticalShift = 3.5;   // INCREASE this to move dots FURTHER SOUTH (cm down)
+    const horizontalShift = -1.6; // DECREASE this to move dots FURTHER WEST (cm left)
+    // -----------------------
+
+    // Horizontal math + shift
+    const x = ((data.lng + 180) * (100 / 360)) + horizontalShift;
     
-    // Vertical math with calibration
-    const y = equatorOffset - (data.lat * verticalScale); 
+    // Vertical math + offset + shift
+    const y = equatorOffset - (data.lat * verticalScale) + verticalShift; 
 
     return { t: y, l: x };
 }
@@ -175,4 +180,5 @@ function getPos(city) {
     </script>
 </body>
 </html>
+
 
