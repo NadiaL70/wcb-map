@@ -3,58 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WCB 2026 | Global Reach</title>
+    <title>WCB 2026 | Global Community</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        :root { --brand-blue: #00d2ff; --dark-bg: #0b0e14; }
-        body { background-color: var(--dark-bg); color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; text-align: center; }
+        :root { 
+            --brand-blue: #0984e3; 
+            --accent-blue: #00d2ff; 
+            --bg-light: #f4f7f9; 
+        }
         
-        .stats-grid { display: flex; justify-content: center; gap: 40px; margin-bottom: 30px; }
-        .num { font-size: 2.8rem; font-weight: bold; color: var(--brand-blue); display: block; }
-        .label { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; }
-
-        #map { 
-            height: 650px; 
-            width: 100%; 
-            max-width: 1200px; 
-            margin: auto; 
-            border-radius: 24px; 
-            border: 1px solid rgba(255,255,255,0.1);
-            background: #0b0e14;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        body { 
+            background-color: var(--bg-light); 
+            color: #2d3436; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0; padding: 40px 20px; text-align: center; 
         }
 
-        /* Custom Animated Ping Marker */
+        /* Registration Button Area */
+        .action-container { margin: 20px auto 40px; }
+        .reg-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--brand-blue) 0%, var(--accent-blue) 100%);
+            color: white;
+            text-decoration: none;
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 50px;
+            box-shadow: 0 10px 25px rgba(9, 132, 227, 0.3);
+            transition: all 0.3s ease;
+            border: 2px solid white;
+        }
+        .reg-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(0, 210, 255, 0.5);
+            filter: brightness(1.1);
+        }
+        .sub-text { margin-top: 15px; font-size: 0.9rem; color: #636e72; font-style: italic; }
+
+        /* Stats Cards */
+        .stats-grid { display: flex; justify-content: center; gap: 25px; margin-bottom: 30px; }
+        .stat-card {
+            background: white;
+            padding: 20px 35px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,210,255,0.1);
+            min-width: 160px;
+        }
+        .num { font-size: 3rem; font-weight: 800; color: var(--brand-blue); display: block; line-height: 1; margin-bottom: 5px;}
+        .label { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1.5px; color: #636e72; font-weight: 600; }
+
+        /* Map Container */
+        #map { 
+            height: 650px; width: 100%; max-width: 1150px; margin: auto; 
+            border-radius: 30px; 
+            background: #e0e0e0;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            border: 10px solid white;
+            z-index: 1; /* Keeps map base low */
+        }
+
+        /* HIGH-VISIBILITY PING MARKER */
         .ping-marker {
-            background: var(--brand-blue);
+            background: #d63031; /* Vibrant Red/Coral for maximum contrast on light map */
             border-radius: 50%;
-            box-shadow: 0 0 0 rgba(0, 210, 255, 0.4);
+            border: 3px solid white;
+            box-shadow: 0 0 15px rgba(214, 48, 49, 0.6);
             animation: pulse 2s infinite;
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(0, 210, 255, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(0, 210, 255, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(0, 210, 255, 0); }
+            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(214, 48, 49, 0.7); }
+            70% { transform: scale(1.2); box-shadow: 0 0 0 15px rgba(214, 48, 49, 0); }
+            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(214, 48, 49, 0); }
         }
 
-        /* Tooltip Styling */
         .leaflet-tooltip {
-            background: #1a1d23 !important;
+            background: #2d3436 !important;
             color: white !important;
-            border: 1px solid var(--brand-blue) !important;
-            border-radius: 4px;
-            font-size: 12px;
+            border: none !important;
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 10000;
         }
     </style>
 </head>
 <body>
 
-    <h1 style="margin-bottom: 10px;">WCB 2026 Global Community</h1>
+    <h1 style="font-weight: 300; font-size: 2.5rem; margin-bottom: 5px;">WCB 2026 <strong style="color:var(--brand-blue)">Global Community</strong></h1>
     
+    <div class="action-container">
+        <a href="#" target="_blank" class="reg-button">Join the Map & Register →</a>
+        <p class="sub-text">Register today and see your city light up!</p>
+    </div>
+
     <div class="stats-grid">
-        <div><span class="num" id="count-attendees">0</span><span class="label">Registrants</span></div>
-        <div><span class="num" id="count-countries">0</span><span class="label">Countries</span></div>
+        <div class="stat-card"><span class="num" id="count-attendees">0</span><span class="label">Registrants</span></div>
+        <div class="stat-card"><span class="num" id="count-countries">0</span><span class="label">Countries</span></div>
     </div>
 
     <div id="map"></div>
@@ -64,18 +112,16 @@
     <script>
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSOjDCF8O1kJoBoigy8sl3lRLMvxVOSvg-scxdb5C1hv3usB6uwGZR9CP97fLs_E_GdNhHXidpi7Gv8/pub?output=csv';
 
-        // Initialize Map
         const map = L.map('map', {
             center: [25, 0],
             zoom: 2,
             minZoom: 2,
-            maxZoom: 7,
-            zoomControl: false,
+            zoomControl: true,
             attributionControl: false
         });
 
-        // High-end Dark Map Tiles
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+        // Soft, modern map layer
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
 
         const hubs = {
             'Vancouver': [49.28, -123.12], 'Calgary': [51.04, -114.07], 'Edmonton': [53.54, -113.49],
@@ -115,6 +161,7 @@
                 
                 const countries = new Set();
                 let attendees = 0;
+                const addedCities = new Set();
 
                 lines.forEach(line => {
                     const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
@@ -124,17 +171,24 @@
                     if (city || country) attendees++;
                     if (country) countries.add(country);
 
-                    if (hubs[city]) {
-                        const icon = L.divIcon({ className: 'ping-marker', iconSize: [10, 10] });
+                    if (hubs[city] && !addedCities.has(city)) {
+                        const icon = L.divIcon({ 
+                            className: 'ping-marker', 
+                            iconSize: [18, 18],
+                            iconAnchor: [9, 9] 
+                        });
+
                         L.marker(hubs[city], { icon: icon }).addTo(map)
                          .bindTooltip(`<b>${city}</b><br>${country}`, { direction: 'top', offset: [0, -5] });
+                        
+                        addedCities.add(city);
                     }
                 });
 
                 document.getElementById('count-attendees').innerText = attendees;
                 document.getElementById('count-countries').innerText = countries.size;
 
-            } catch (e) { console.error("Map Load Error:", e); }
+            } catch (e) { console.error("Map Error:", e); }
         }
 
         loadData();
