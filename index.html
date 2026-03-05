@@ -10,24 +10,28 @@
         body { background-color: var(--dark-bg); color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 20px; text-align: center; }
         
         /* Join Button Styling */
-        .btn-container { margin: 20px 0 30px 0; }
+        .btn-container { 
+            margin: 20px 0 30px 0; 
+            position: relative; 
+            z-index: 1000; /* Ensures button is always on top */
+        }
         .join-btn {
             display: inline-block;
             background: #0984e3;
             color: white;
-            padding: 15px 35px;
+            padding: 15px 40px;
             border-radius: 50px;
             text-decoration: none;
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             border: 2px solid rgba(255,255,255,0.2);
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3);
         }
         .join-btn:hover { 
             background: var(--brand-blue); 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 210, 255, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 210, 255, 0.5);
         }
 
         .stats-grid { display: flex; justify-content: center; gap: 40px; margin-bottom: 30px; }
@@ -74,7 +78,7 @@
     <h1 style="margin-bottom: 10px;">WCB 2026 Global Community</h1>
 
     <div class="btn-container">
-        <a href="YOUR_LINK_HERE" target="_blank" class="join-btn">Join the Map & Register →</a>
+        <a href="https://wcb2026.com/registration/" target="_blank" class="join-btn">Join the Map & Register →</a>
     </div>
     
     <div class="stats-grid">
@@ -89,7 +93,6 @@
     <script>
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSOjDCF8O1kJoBoigy8sl3lRLMvxVOSvg-scxdb5C1hv3usB6uwGZR9CP97fLs_E_GdNhHXidpi7Gv8/pub?output=csv';
 
-        // Initialize Map
         const map = L.map('map', {
             center: [25, 0],
             zoom: 2,
@@ -99,7 +102,6 @@
             attributionControl: false
         });
 
-        // High-end Dark Map Tiles
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
         const hubs = {
@@ -139,7 +141,7 @@
                 const lines = csv.split(/\r?\n/).filter(line => line.trim() !== "").slice(1);
                 
                 const countries = new Set();
-                const processedCities = new Set(); // To prevent duplicate dots
+                const processedCities = new Set(); 
                 let attendees = 0;
 
                 lines.forEach(line => {
@@ -150,7 +152,6 @@
                     if (city || country) attendees++;
                     if (country) countries.add(country);
 
-                    // Add marker only if we haven't added this city yet
                     if (hubs[city] && !processedCities.has(city)) {
                         const icon = L.divIcon({ className: 'ping-marker', iconSize: [10, 10] });
                         L.marker(hubs[city], { icon: icon }).addTo(map)
