@@ -6,37 +6,15 @@
     <title>WCB 2026 | Global Community Map</title>
     <style>
         :root { --brand-blue: #00d2ff; --dark-bg: #0b0e14; }
-        body { background-color: var(--dark-bg); color: white; font-family: 'Inter', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
-        
+        body { background-color: var(--dark-bg); color: white; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
         .stats-grid { display: flex; gap: 40px; margin-bottom: 30px; background: rgba(255,255,255,0.05); padding: 20px 40px; border-radius: 50px; border: 1px solid rgba(0,210,255,0.3); }
-        .stat-card { text-align: center; }
-        .num { font-size: 2.5rem; font-weight: bold; color: var(--brand-blue); display: block; }
-        .label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; }
-
+        .num { font-size: 2.5rem; font-weight: bold; color: var(--brand-blue); display: block; text-align: center; }
+        .label { font-size: 0.8rem; text-transform: uppercase; opacity: 0.7; }
         .map-container { position: relative; width: 100%; max-width: 1100px; background: rgba(255,255,255,0.02); border-radius: 20px; padding: 10px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; }
         .base-map { width: 100%; display: block; opacity: 0.3; filter: invert(1); pointer-events: none; }
-
-        .ping {
-            position: absolute;
-            width: 6px; height: 6px;
-            background-color: var(--brand-blue);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 8px var(--brand-blue);
-        }
-        .ping::after {
-            content: ''; position: absolute; width: 100%; height: 100%;
-            border: 1px solid var(--brand-blue); border-radius: 50%;
-            animation: pulse 2.5s infinite;
-        }
+        .ping { position: absolute; width: 6px; height: 6px; background-color: var(--brand-blue); border-radius: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 8px var(--brand-blue); }
+        .ping::after { content: ''; position: absolute; width: 100%; height: 100%; border: 1px solid var(--brand-blue); border-radius: 50%; animation: pulse 2.5s infinite; }
         @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(4); opacity: 0; } }
-
-        .ping:hover::before {
-            content: attr(title);
-            position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
-            background: white; color: black; padding: 4px 8px; border-radius: 4px;
-            font-size: 11px; font-weight: bold; white-space: nowrap; z-index: 100;
-        }
     </style>
 </head>
 <body>
@@ -44,11 +22,11 @@
     <h1>WCB 2026 Global Reach</h1>
     
     <div class="stats-grid">
-        <div class="stat-card">
+        <div style="text-align:center">
             <span class="num" id="count-attendees">0</span>
             <span class="label">Registrants</span>
         </div>
-        <div class="stat-card">
+        <div style="text-align:center">
             <span class="num" id="count-countries">0</span>
             <span class="label">Countries</span>
         </div>
@@ -59,73 +37,48 @@
     </div>
 
     <script>
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSOjDCF8O1kJoBoigy8sl3lRLMvxVOSvg-scxdb5C1hv3usB6uwGZR9CP97fLs_E_GdNhHXidpi7Gv8/pub?output=csv';
+        // Use a proxy to bypass Google's "No-CORS" policy
+        const rawCsvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSOjDCF8O1kJoBoigy8sl3lRLMvxVOSvg-scxdb5C1hv3usB6uwGZR9CP97fLs_E_GdNhHXidpi7Gv8/pub?output=csv';
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(rawCsvUrl)}&t=${new Date().getTime()}`;
 
         const hubs = {
             'Vancouver': { lat: 49.28, lng: -123.12 }, 'Calgary': { lat: 51.04, lng: -114.07 },
             'Edmonton': { lat: 53.54, lng: -113.49 }, 'Ottawa': { lat: 45.42, lng: -75.69 },
             'Montreal': { lat: 45.50, lng: -73.56 }, 'Toronto': { lat: 43.65, lng: -79.38 },
-            'Fredericton': { lat: 45.96, lng: -66.64 }, 'Moncton': { lat: 46.08, lng: -64.77 },
-            'Halifax': { lat: 44.64, lng: -63.57 }, 'Lethbridge': { lat: 49.69, lng: -112.84 },
-            'Burnaby': { lat: 49.24, lng: -122.98 }, 'Boston': { lat: 42.36, lng: -71.05 },
-            'New York': { lat: 40.71, lng: -74.00 }, 'Newark': { lat: 40.73, lng: -74.17 },
-            'Chicago': { lat: 41.87, lng: -87.62 }, 'Stanford': { lat: 37.42, lng: -122.17 },
-            'Seattle': { lat: 47.60, lng: -122.33 }, 'San Diego': { lat: 32.71, lng: -117.16 },
-            'Los Angeles': { lat: 34.05, lng: -118.24 }, 'Atlanta': { lat: 33.74, lng: -84.38 },
-            'Austin': { lat: 30.26, lng: -97.74 }, 'Pittsburgh': { lat: 40.44, lng: -79.99 },
-            'Ann Arbor': { lat: 42.28, lng: -83.74 }, 'Ames': { lat: 42.03, lng: -93.63 },
-            'Iowa City': { lat: 41.66, lng: -91.53 }, 'Madison': { lat: 43.07, lng: -89.40 },
-            'Eugene': { lat: 44.05, lng: -123.08 }, 'Salt Lake City': { lat: 40.76, lng: -111.89 },
-            'Denver': { lat: 39.73, lng: -104.99 }, 'Philadelphia': { lat: 39.95, lng: -75.16 },
+            'Boston': { lat: 42.36, lng: -71.05 }, 'New York': { lat: 40.71, lng: -74.00 },
             'London': { lat: 51.50, lng: -0.12 }, 'Zurich': { lat: 47.37, lng: 8.54 },
-            'Paris': { lat: 48.85, lng: 2.35 }, 'Amsterdam': { lat: 52.36, lng: 4.90 },
-            'Eindhoven': { lat: 51.44, lng: 5.46 }, 'Maastricht': { lat: 50.85, lng: 5.69 },
-            'Delft': { lat: 52.01, lng: 4.35 }, 'Berlin': { lat: 52.52, lng: 13.40 },
-            'Munich': { lat: 48.13, lng: 11.58 }, 'Stuttgart': { lat: 48.77, lng: 9.18 },
-            'Milan': { lat: 45.46, lng: 9.18 }, 'Rome': { lat: 41.90, lng: 12.49 },
-            'Barcelona': { lat: 41.38, lng: 2.17 }, 'Madrid': { lat: 40.41, lng: -3.70 },
-            'Vienna': { lat: 48.20, lng: 16.37 }, 'Bern': { lat: 46.94, lng: 7.44 },
-            'Lausanne': { lat: 46.51, lng: 6.63 }, 'Leuven': { lat: 50.87, lng: 4.70 },
-            'Galway': { lat: 53.27, lng: -9.05 }, 'Dublin': { lat: 53.34, lng: -6.26 },
-            'Leeds': { lat: 53.80, lng: -1.54 }, 'Sheffield': { lat: 53.38, lng: -1.47 },
-            'Tokyo': { lat: 35.67, lng: 139.65 }, 'Kyoto': { lat: 35.01, lng: 135.76 },
-            'Sapporo': { lat: 43.06, lng: 141.35 }, 'Seoul': { lat: 37.56, lng: 126.97 },
-            'Daejeon': { lat: 36.35, lng: 127.38 }, 'Singapore': { lat: 1.35, lng: 103.81 },
-            'Sydney': { lat: -33.86, lng: 151.20 }, 'Melbourne': { lat: -37.81, lng: 144.96 },
-            'Auckland': { lat: -36.84, lng: 174.76 }, 'Taipei': { lat: 25.03, lng: 121.56 },
-            'Wuhan': { lat: 30.59, lng: 114.30 }, 'Hong Kong': { lat: 22.31, lng: 114.16 },
-            'Beijing': { lat: 39.90, lng: 116.40 }, 'Exeter': { lat: 50.71, lng: -3.53 },
-            'Gwangju': { lat: 35.16, lng: 126.85 }, 'Sendai': { lat: 38.26, lng: 140.86 },
-            'Innsbruck': { lat: 47.26, lng: 11.40 }, 'Erlangen': { lat: 49.58, lng: 11.00 },
-            'Goesan': { lat: 36.81, lng: 127.79 }, 'Koblenz': { lat: 50.35, lng: 7.58 },
+            'Tokyo': { lat: 35.67, lng: 139.65 }, 'Seoul': { lat: 37.56, lng: 126.97 },
+            'Sydney': { lat: -33.86, lng: 151.20 }, 'Eindhoven': { lat: 51.44, lng: 5.46 },
+            'Daejeon': { lat: 36.35, lng: 127.38 }, 'Ames': { lat: 42.03, lng: -93.63 },
+            'Iowa City': { lat: 41.66, lng: -91.53 }, 'Pittsburgh': { lat: 40.44, lng: -79.99 },
+            'Ann Arbor': { lat: 42.28, lng: -83.74 }, 'Leeds': { lat: 53.80, lng: -1.54 },
+            'Bern': { lat: 46.94, lng: 7.44 }, 'Goesan': { lat: 36.81, lng: 127.79 },
+            'Koblenz': { lat: 50.35, lng: 7.58 }, 'Galway': { lat: 53.27, lng: -9.05 },
             'Bath': { lat: 51.37, lng: -2.35 }, 'Providence': { lat: 41.82, lng: -71.41 },
             'Cleveland': { lat: 41.49, lng: -81.69 }, 'Morgantown': { lat: 39.62, lng: -79.95 },
             'Braunschweig': { lat: 52.26, lng: 10.52 }, 'Nottingham': { lat: 52.95, lng: -1.15 },
             'Blacksburg': { lat: 37.22, lng: -80.41 }, 'East Lansing': { lat: 42.73, lng: -84.48 },
-            'Tel Aviv': { lat: 32.08, lng: 34.78 }
+            'Tel Aviv': { lat: 32.08, lng: 34.78 }, 'Burnaby': { lat: 49.24, lng: -122.98 }
         };
 
         function getPos(city) {
             const data = hubs[city];
             if (!data) return null;
-
-            // UPDATED CALIBRATION: Moved dots South and West
-            const vScale = 0.42; 
-            const eOffset = 42; 
-            const vShift = 4.2;   // Increased to move dots further SOUTH
-            const hShift = -2.6;  // Decreased to move dots further WEST
-
-            const x = ((data.lng + 180) * (100 / 360)) + hShift;
-            const y = eOffset - (data.lat * vScale) + vShift; 
-
-            return { t: y, l: x };
+            const vScale = 0.42; const eOffset = 42; 
+            const vShift = 4.2; const hShift = -2.6; 
+            return {
+                t: eOffset - (data.lat * vScale) + vShift,
+                l: ((data.lng + 180) * (100 / 360)) + hShift
+            };
         }
 
         async function loadData() {
             try {
-                const res = await fetch(csvUrl);
-                const csv = await res.text();
-                const lines = csv.split(/\r?\n/).slice(1);
+                const res = await fetch(proxyUrl);
+                const data = await res.json();
+                const csv = data.contents;
+                
+                const lines = csv.split(/\r?\n/).filter(line => line.trim() !== "").slice(1);
                 const countries = new Set();
                 const mapArea = document.getElementById('map-area');
 
@@ -142,7 +95,7 @@
                             dot.className = 'ping';
                             dot.style.top = pos.t + '%';
                             dot.style.left = pos.l + '%';
-                            dot.setAttribute('title', `${city}, ${country}`);
+                            dot.title = `${city}, ${country}`;
                             mapArea.appendChild(dot);
                         }
                     } else if (country) {
@@ -150,9 +103,11 @@
                     }
                 });
 
-                document.getElementById('count-attendees').innerText = lines.filter(l => l.trim() !== "").length;
+                document.getElementById('count-attendees').innerText = lines.length;
                 document.getElementById('count-countries').innerText = countries.size;
-            } catch (e) { console.error("Error:", e); }
+            } catch (e) {
+                console.error("Fetch Error:", e);
+            }
         }
         loadData();
     </script>
