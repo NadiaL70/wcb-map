@@ -14,6 +14,7 @@
             margin: 0; padding: 40px 20px; text-align: center; 
         }
 
+        /* Registration Button */
         .action-container { margin-bottom: 30px; }
         .reg-button {
             display: inline-block;
@@ -27,46 +28,56 @@
             transition: 0.3s;
             border: 2px solid rgba(255,255,255,0.2);
         }
+        .reg-button:hover { background: var(--brand-blue); transform: translateY(-2px); }
 
+        /* Stats Section */
         .stats-grid { display: flex; justify-content: center; gap: 20px; margin-bottom: 30px; }
         .stat-card {
             background: rgba(255,255,255,0.05);
             padding: 15px 25px;
             border-radius: 15px;
             border: 1px solid rgba(255,255,255,0.1);
+            min-width: 120px;
         }
         .num { font-size: 2.5rem; font-weight: bold; color: var(--brand-blue); display: block; }
         .label { font-size: 0.7rem; text-transform: uppercase; opacity: 0.7; }
 
-        /* RELIABLE MAP BOX */
-        #map-container {
-            position: relative;
+        /* THE MAP FIX */
+        #map-outer {
             width: 100%;
             max-width: 1000px;
             margin: 0 auto;
-            border-radius: 20px;
-            overflow: hidden;
+            position: relative;
             background: #0b0e14;
+            border-radius: 20px;
             border: 1px solid rgba(255,255,255,0.1);
-            line-height: 0; /* Removes ghost spacing under image */
+            /* This forces the map to be a 2:1 rectangle so it never becomes a line */
+            aspect-ratio: 2 / 1; 
+            overflow: hidden;
         }
 
         #map-image { 
             width: 100%; 
-            height: auto;
+            height: 100%;
+            object-fit: cover;
             display: block; 
-            opacity: 0.8; 
+            opacity: 0.6; 
+        }
+
+        #dots-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
         }
 
         .ping {
             position: absolute;
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             background-color: var(--brand-blue);
             border-radius: 50%;
-            transform: translate(-50%, -50%); /* Centers the dot on the coordinate */
+            transform: translate(-50%, -50%);
             box-shadow: 0 0 10px var(--brand-blue);
-            z-index: 5;
         }
 
         .ping::after {
@@ -89,7 +100,7 @@
     <h1>WCB 2026 Global Community</h1>
 
     <div class="action-container">
-        <a href="YOUR_LINK_HERE" target="_blank" class="reg-button">Join the Map & Register →</a>
+        <a href="YOUR_REGISTRATION_LINK" target="_blank" class="reg-button">Join the Map & Register →</a>
     </div>
     
     <div class="stats-grid">
@@ -97,9 +108,9 @@
         <div class="stat-card"><span class="num" id="count-countries">0</span><span class="label">Countries</span></div>
     </div>
 
-    <div id="map-container">
-        <img id="map-image" src="https://naturalearth.s3.amazonaws.com/shaded_relief/SR_LR.jpg" alt="World Map">
-        <div id="dots-area"></div>
+    <div id="map-outer">
+        <img id="map-image" src="https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg" alt="World Map">
+        <div id="dots-layer"></div>
     </div>
 
     <script>
@@ -156,20 +167,19 @@
                     if (hubs[city] && !processedCities.has(city)) {
                         const [lat, lng] = hubs[city];
                         
-                        // Simple Equirectangular Calibration (Since we changed the map image)
-                        const x = ((lng + 180) / 360) * 100;
-                        const y = (1 - (lat + 90) / 180) * 100;
+                        // Mercator-style projection math for this specific map image
+                        const left = ((lng + 180) / 360) * 100;
+                        const top = (1 - (Math.log(Math.tan((lat + 90) * Math.PI / 360)) / Math.PI)) * 50;
 
-                        // Fine tuning for this specific image
-                        const left = x - 0.5; 
-                        const top = y + 5; 
+                        // Slight nudge for alignment
+                        const finalTop = top + 5; 
 
                         const dot = document.createElement('div');
                         dot.className = 'ping';
                         dot.style.left = left + '%';
-                        dot.style.top = top + '%';
+                        dot.style.top = finalTop + '%';
                         dot.title = city;
-                        document.getElementById('dots-area').appendChild(dot);
+                        document.getElementById('dots-layer').appendChild(dot);
                         
                         processedCities.add(city);
                     }
