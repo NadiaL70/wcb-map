@@ -92,7 +92,14 @@
     <script>
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRcRtKUaEFYWINneAKV_F1cNlM-orCMDHerULEMLdyWNo06iWWsJ3Lz8QDvVWtBD9W_Li3iFY90F_wi/pub?output=csv';
 
-        const map = L.map('map', { center: [20, 0], zoom: 2.5, minZoom: 2, maxZoom: 8, zoomControl: false, attributionControl: true });
+const map = L.map('map', { 
+    center: [15, 0],    // Slightly lower center to show more of the Southern Hemisphere
+    zoom: 1.8,          // "Zoomed out" further than 2.5 to see the whole globe
+    minZoom: 1.5,       // Prevents people from zooming out into "infinite grey"
+    maxZoom: 8, 
+    zoomControl: false, 
+    attributionControl: true 
+});
         
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
